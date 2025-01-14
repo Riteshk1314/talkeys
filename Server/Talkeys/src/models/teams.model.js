@@ -1,12 +1,11 @@
 const mongoose =  require("mongoose");
-const { int } = require("three/examples/jsm/nodes/Nodes.js");
-const TeamSchema= new mongoose.schema({
+const TeamSchema= new mongoose.Schema({
     teamName: {
         type: String,
         required: true,
     },
     TeamCode: {
-        type: int,
+        type: Number,
         required: true,
     },
     teamMembers: {
@@ -20,8 +19,8 @@ const TeamSchema= new mongoose.schema({
         required: true,
     },
     MaxMembers: {
-        type: int,
-        required
+        type: Number,
+        required:true,
     },
     dateCreated: {
         type: Date,
