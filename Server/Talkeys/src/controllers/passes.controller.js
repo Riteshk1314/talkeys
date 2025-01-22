@@ -5,13 +5,23 @@ const { validateEmail, validatePhoneNumber, } = require("../helpers/validatorHel
 const express = require('express');
 const auth = require('../middleware/oauth.js');
 const Event = require('../models/events.model.js');
+const Team = require('../models/teams.model.js');
 const Pass = require('../models/passes.model.js');
 const mongoose = require('mongoose');
 
 const bookTicket = async (req, res) => {
-    const { name, slotId } = req.body;
+    const { teamcode, name, slotId } = req.body;
     const userId = req.user.id;  // Assuming auth middleware adds user to request
-
+    if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    const team = await Team.findOne({ teamCode: teamcode });
+    if (!team) {
+        return res.status(404).json({ error: "Team not found" });
+    }
+    if(userId !== team.teamLeader) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     // Validate required fields
     if (!name) {
         return res.status(400).json({ error: "Event name is required" });
