@@ -8,7 +8,8 @@ const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID; // Your Google Client ID
 const client = new OAuth2Client(CLIENT_ID);
 
-exports.verifyIdToken = async (idToken, res, next) => {
+exports.verifyIdToken = async (req, res, next) => {
+  const { body: { idToken } } = req;
   try {
     const ticket = await client.verifyIdToken({
       idToken,
@@ -20,7 +21,11 @@ exports.verifyIdToken = async (idToken, res, next) => {
     next();
   } catch (error) {
     console.error('Token verification failed:', error.message);
-    return null;
+    if (error.message.includes('No pem found for envelope')) {
+      res.status(401).send('Invalid token');
+    } else {
+      next(error);
+    }
   }
 }
 
